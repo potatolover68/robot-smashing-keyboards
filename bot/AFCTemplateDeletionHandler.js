@@ -124,7 +124,7 @@ function prepareAFCTemplates(comments, submissions) {
   });
 
   if (result.trim().length > 0) {
-    result = result.trim() + '<!-- EDIT BELOW THIS LINE -->\n----\n';
+    result = result.trim() + '\n----\n';
   }
 
   return result;
