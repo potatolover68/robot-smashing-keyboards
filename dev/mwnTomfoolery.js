@@ -16,5 +16,5 @@ history.forEach(async revision => {
 });
 */
 
-const result = await HandleAFCTemplateDeletion(bot, 1327020615, true, true);
+const result = await HandleAFCTemplateDeletion(bot, 1327020615, true);
 console.log(result);

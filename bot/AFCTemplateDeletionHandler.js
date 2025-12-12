@@ -13,7 +13,7 @@ function extractAFCSubmissionTemplates(body) {
     // Check if it's a custom reason template (can have nested templates)
     if (customReasonRegex.test(body.slice(startIndex))) {
       // Use brace counting for nested templates
-      let braceCount = 2;
+      let braceCount = 1; // We've matched one pair {{
       let i = startIndex + match[0].length;
 
       while (i < body.length && braceCount > 0) {
