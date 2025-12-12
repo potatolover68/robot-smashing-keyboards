@@ -15,3 +15,11 @@ const bot = await Mwn.init({
         assert: 'user'
     }
 });
+bot.setOptions({
+    editConfig: {
+        exclusionRegex: /\{\{nobots\}\}/i
+    }
+});
+
+
+export { bot };

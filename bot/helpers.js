@@ -12,6 +12,62 @@ async function compareEdits(bot, fromrev, torev) {
   });
 }
 
+async function getRevisionContent(bot, revid) {
+  return await bot.request({
+    action: 'query',
+    revids: revid,
+    prop: 'revisions',
+    rvprop: 'content|timestamp',
+    rvslots: 'main'
+  }).then(result => {
+    const pages = result.query.pages;
+    if (pages && pages.length > 0) {
+      const page = pages[0];
+      if (page.revisions && page.revisions.length > 0) {
+        const revision = page.revisions[0];
+        // Handle both new format (slots.main.content) and legacy format (*)
+        const content = revision.slots?.main?.content || revision['*'];
+        return {
+          content: content,
+          timestamp: revision.timestamp,
+          title: page.title,
+          pageid: page.pageid,
+          revid: revision.revid
+        };
+      }
+    }
+    return null;
+  }).catch(error => {
+    console.error(error);
+    return null;
+  });
+}
+
+async function getPreviousRevisionId(bot, pageid, currentRevid) {
+  return await bot.request({
+    action: 'query',
+    pageids: pageid,
+    prop: 'revisions',
+    rvprop: 'ids',
+    rvlimit: 2,
+    rvstartid: currentRevid,
+    rvdir: 'older'
+  }).then(result => {
+    const pages = result.query.pages;
+    if (pages && pages.length > 0) {
+      const page = pages[0];
+      if (page.revisions && page.revisions.length >= 2) {
+        // First revision is the current one, second is the previous
+        return page.revisions[1].revid;
+      }
+    }
+    return null;
+  }).catch(error => {
+    console.error(error);
+    return null;
+  });
+}
+
 // now this function... this function is actually useful
 function getFirstNLines(text, n) {
   return text.split('\n').slice(0, n).join('\n');
@@ -41,4 +97,4 @@ function makeTimestampLookNiceAndReadableAndNotJustAGiantStringOfNumbers(timesta
 }
 
 
-export {compareEdits, getFirstNLines, makeTimestampLookNiceAndReadableAndNotJustAGiantStringOfNumbers};
+export {compareEdits, getRevisionContent, getPreviousRevisionId, getFirstNLines, makeTimestampLookNiceAndReadableAndNotJustAGiantStringOfNumbers};

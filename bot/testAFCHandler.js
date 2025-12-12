@@ -21,15 +21,15 @@ for (const draft of drafts) {
   const comments = extractAFCCommentTemplates(body);
   console.log(comments);
 
-  console.log('\nAfter RemoveAllAFCTemplates: (first 15 lines)');
+  console.log('\nAfter RemoveAllAFCTemplates: (first 20 lines)');
   const cleaned = RemoveAllAFCTemplates(body);
-  console.log(getFirstNLines(cleaned, 50));
+  console.log(getFirstNLines(cleaned, 20));
   console.log(`\nOriginal length: ${body.length}, Cleaned length: ${cleaned ? cleaned.length : 'undefined (no return value)'}`);
 
   console.log('\n--- Testing appendAFCTemplatesToBody ---');
   console.log('Re-adding templates to cleaned body...');
   const reconstructed = appendAFCTemplatesToBody(body, comments, submissions);
-  console.log('\nReconstructed (first 30 lines):');
-  console.log(getFirstNLines(reconstructed, 30));
+  console.log('\nReconstructed (first 20 lines):');
+  console.log(getFirstNLines(reconstructed, 20));
   console.log(`\nReconstructed length: ${reconstructed.length}`);
 }

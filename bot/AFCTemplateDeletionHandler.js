@@ -1,4 +1,4 @@
-import { makeTimestampLookNiceAndReadableAndNotJustAGiantStringOfNumbers } from './helpers.js';
+import { makeTimestampLookNiceAndReadableAndNotJustAGiantStringOfNumbers, getRevisionContent, getPreviousRevisionId } from './helpers.js';
 
 function extractAFCSubmissionTemplates(body) {
   const results = [];
@@ -116,7 +116,7 @@ function prepareAFCTemplates(comments, submissions) {
   let result = '';
 
   submissions.forEach(item => {
-    result += item.template + '\n<!-- Do not remove this line! -->\n';
+    result += item.template + ' <!-- Do not remove this line! -->\n';
   });
 
   comments.forEach(item => {
@@ -137,8 +137,67 @@ function appendAFCTemplatesToBody(body, comments, submissions) {
 }
 
 
-function HandleAFCTemplateDeletion(bot, page) {
-  
+async function HandleAFCTemplateDeletion(bot, revid, verbose = false, dryRun = false) {
+
+  function verboseLog(msg) {
+    if (verbose) {
+      console.log(msg);
+    }
+  }
+
+  const newrev = await getRevisionContent(bot, revid);
+  verboseLog(`New revision content: ${newrev.content}`);
+  if (!newrev) {
+    console.error('Failed to get new revision content');
+    return false;
+  }
+
+  const previousRevid = await getPreviousRevisionId(bot, newrev.pageid, revid);
+  verboseLog(`Previous revision ID: ${previousRevid}`);
+  if (!previousRevid) {
+    console.error('Failed to get previous revision ID');
+    return false;
+  }
+
+  const oldrev = await getRevisionContent(bot, previousRevid);
+  verboseLog(`Old revision content: ${oldrev.content}`);
+  if (!oldrev) {
+    console.error('Failed to get old revision content');
+    return false;
+  }
+
+
+  verboseLog('\n \n \n ')
+
+  const submissions = extractAFCSubmissionTemplates(oldrev.content);
+  const comments = extractAFCCommentTemplates(oldrev.content);
+  verboseLog(`Comments: ${comments.map(item => item.template).join('\n')}`);
+  verboseLog(`Submissions: ${submissions.map(item => item.template).join('\n')}`);
+  const newContent = appendAFCTemplatesToBody(newrev.content, comments, submissions);
+  verboseLog(`New content: ${newContent}`);
+
+  if (dryRun) {
+    console.log('\n=== 🥀 dry run ===');
+    console.log('\n--- Current page content (newrev) ---');
+    console.log(newrev.content);
+    console.log('\n--- Page content after AFC restoration ---');
+    console.log(newContent);
+    console.log('\n=== 🥀 end dry run ===\n');
+    return true;
+  }
+
+  try {
+    await bot.save(
+      newrev.title,
+      newContent,
+      'Restoring AFC submission templates that were removed'
+    );
+    console.log(`Successfully restored AFC templates to ${newrev.title}`);
+    return true;
+  } catch (error) {
+    console.error('Failed to save page:', error);
+    return false;
+  }
 }
 
 export { HandleAFCTemplateDeletion, extractAFCSubmissionTemplates, extractAFCCommentTemplates, RemoveAllAFCTemplates, appendAFCTemplatesToBody };
