@@ -1,5 +1,5 @@
-import { extractAFCSubmissionTemplates, extractAFCCommentTemplates, RemoveAllAFCTemplates, appendAFCTemplatesToBody } from './AFCTemplateDeletionHandler.js';
-import { getFirstNLines } from './helpers.js';
+import { extractAFCSubmissionTemplates, extractAFCCommentTemplates, RemoveAllAFCTemplates, appendAFCTemplatesToBody } from '../bot/AFCTemplateDeletionHandler.js';
+import { getFirstNLines } from '../bot/helpers.js';
 
 import fs from 'fs';
 import path from 'path';
@@ -33,3 +33,4 @@ for (const draft of drafts) {
   console.log(getFirstNLines(reconstructed, 20));
   console.log(`\nReconstructed length: ${reconstructed.length}`);
 }
+
