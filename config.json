@@ -2,5 +2,6 @@
   "dryRun": false,
   "pollInterval": 30,
   "pollIntervalSlack": 31,
+  "delayAfterFilterTrigger": 120,
   "verbose": true
 }
