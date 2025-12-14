@@ -1,6 +1,6 @@
 {
   "dryRun": false,
-  "pollInterval": 5,
-  "pollIntervalSlack": 1,
+  "pollInterval": 30,
+  "pollIntervalSlack": 31,
   "verbose": true
 }
