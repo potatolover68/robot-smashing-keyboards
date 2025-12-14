@@ -34,14 +34,16 @@ setInterval(async () => {
     if (newFilterTrigger !== lastFilterTrigger) {
         lastFilterTrigger = newFilterTrigger;
         console.log(`New filter trigger found: ${newFilterTrigger}`);
-        try {
-            await HandleAFCTemplateDeletion(bot, newFilterTrigger, config.verbose, config.dryRun);
-        } catch (error) {
-            console.error(`Error restoring AFC templates: ${error}`);
-        }
-        if (config.verbose) {
-            console.log(`Successfully restored AFC templates to ${newFilterTrigger}`);
-        }
+        setTimeout(async () => {
+            try {
+                await HandleAFCTemplateDeletion(bot, newFilterTrigger, config.verbose, config.dryRun);
+                if (config.verbose) {
+                    console.log(`Successfully restored AFC templates to ${newFilterTrigger}`);
+                }
+            } catch (error) {
+                console.error(`Error restoring AFC templates: ${error}`);
+            }
+        }, config.delayAfterFilterTrigger * 1000);
     }
 }, config.pollInterval * 1000);
 
